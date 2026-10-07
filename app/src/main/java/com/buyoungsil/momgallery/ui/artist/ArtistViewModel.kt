@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 data class ArtistState(
     val featured: Artwork? = null, // 대표로 걸어 둘 그림
     val count: Int = 0,
+    val loading: Boolean = true, // 불러오는 동안은 액자 자리를 비워 두지 않고 빈 액자를 보여줘요
 )
 
 class ArtistViewModel(private val repo: GalleryRepository) : ViewModel() {
@@ -31,6 +32,7 @@ class ArtistViewModel(private val repo: GalleryRepository) : ViewModel() {
                 ArtistState(
                     featured = list.firstOrNull { a -> a.featured } ?: list.firstOrNull(),
                     count = list.size,
+                    loading = false,
                 )
             }
         }

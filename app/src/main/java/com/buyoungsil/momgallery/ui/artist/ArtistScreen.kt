@@ -1,5 +1,22 @@
 package com.buyoungsil.momgallery.ui.artist
 
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.buyoungsil.momgallery.data.Artwork
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -29,7 +46,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.buyoungsil.momgallery.ui.common.ArtworkImage
 import com.buyoungsil.momgallery.ui.common.BigButton
 import com.buyoungsil.momgallery.ui.common.appViewModel
 
@@ -75,33 +91,39 @@ fun ArtistScreen(
         )
 
         // 대표 작품: 액자에 걸린 것처럼
-        state.featured?.let { artwork ->
+        // 액자 크기는 그림이 오기 전에도 늘 같아요. 그래서 그림이 뜰 때 글이 밀리지 않아요.
+        if (state.loading || state.featured != null) {
+            val artwork = state.featured
             Spacer(Modifier.height(32.dp))
-            Column(Modifier.clickable { onOpenArtwork(artwork.id) }) {
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .shadow(8.dp)
-                        .background(Mat)
-                        .padding(14.dp),
-                ) {
-                    ArtworkImage(
-                        artwork,
-                        vm.imageUrl(artwork.imageUrl),
-                        Modifier.fillMaxWidth(),
-                        elevated = false,
+            Column(
+                Modifier.clickable(enabled = artwork != null) { artwork?.let { onOpenArtwork(it.id) } },
+            ) {
+                FeaturedFrame(artwork = artwork, url = artwork?.let { vm.imageUrl(it.imageUrl) })
+                // 제목 자리도 미리 잡아 둬요 (제목 한 줄 + "대표 작품" 한 줄)
+                if (artwork != null) {
+                    Text(
+                        artwork.title,
+                        style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Serif),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 14.dp),
                     )
+                    Text(
+                        "대표 작품",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                } else {
+                    Text(
+                        " ",
+                        style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Serif),
+                        modifier = Modifier
+                            .padding(top = 14.dp)
+                            .width(160.dp)
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                    )
+                    Text(" ", style = MaterialTheme.typography.bodyMedium)
                 }
-                Text(
-                    artwork.title,
-                    style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Serif),
-                    modifier = Modifier.padding(top = 14.dp),
-                )
-                Text(
-                    "대표 작품",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
             }
         }
 
@@ -154,5 +176,48 @@ fun ArtistScreen(
             }
         }
         Spacer(Modifier.height(32.dp))
+    }
+}
+
+
+// 항상 같은 크기(4:3)의 액자. 그림은 잘리지 않게 안쪽에 맞춰 넣고,
+// 불러오는 동안에는 반짝이는 빈 자리(스켈레톤)를 보여줘요.
+@Composable
+private fun FeaturedFrame(artwork: Artwork?, url: String?) {
+    var loaded by remember(url) { mutableStateOf(false) }
+
+    val transition = rememberInfiniteTransition(label = "shimmer")
+    val alpha by transition.animateFloat(
+        initialValue = 0.35f,
+        targetValue = 0.8f,
+        animationSpec = infiniteRepeatable(tween(900), RepeatMode.Reverse),
+        label = "shimmerAlpha",
+    )
+
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .shadow(8.dp)
+            .background(Mat)
+            .padding(14.dp)
+            .aspectRatio(4f / 3f),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (!loaded) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.outline.copy(alpha = alpha * 0.35f)),
+            )
+        }
+        if (artwork != null && url != null) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current).data(url).crossfade(true).build(),
+                contentDescription = artwork.title,
+                contentScale = ContentScale.Fit,
+                onSuccess = { loaded = true },
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
     }
 }
