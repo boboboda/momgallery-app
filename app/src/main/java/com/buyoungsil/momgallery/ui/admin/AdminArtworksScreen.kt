@@ -15,7 +15,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -95,9 +102,18 @@ fun AdminArtworksScreen(onBack: () -> Unit, onNew: () -> Unit, onEdit: (Int) -> 
                 if (state.items.isEmpty()) {
                     item {
                         Text(
-                            "아직 올린 그림이 없어요.",
+                            "아직 올린 그림이 없어요. 위 버튼으로 첫 그림을 올려 보세요.",
                             style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 12.dp),
+                        )
+                    }
+                } else {
+                    item {
+                        Text(
+                            "모두 ${state.items.size}점 · 누르면 고칠 수 있어요",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -106,8 +122,10 @@ fun AdminArtworksScreen(onBack: () -> Unit, onNew: () -> Unit, onEdit: (Int) -> 
                     Row(
                         Modifier
                             .fillMaxWidth()
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                             .clickable { onEdit(artwork.id) }
-                            .padding(vertical = 6.dp),
+                            .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         AsyncImage(
@@ -115,29 +133,43 @@ fun AdminArtworksScreen(onBack: () -> Unit, onNew: () -> Unit, onEdit: (Int) -> 
                             contentDescription = artwork.title,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .size(96.dp)
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                                .size(104.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.outline),
                         )
                         Spacer(Modifier.width(16.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(artwork.title, style = MaterialTheme.typography.titleMedium)
                             Text(
-                                artwork.subtitle(),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                artwork.title,
+                                style = MaterialTheme.typography.titleMedium,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
                             )
+                            val sub = artwork.subtitle()
+                            if (sub.isNotBlank()) {
+                                Text(
+                                    sub,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                             if (artwork.featured) {
+                                Spacer(Modifier.height(6.dp))
                                 Text(
                                     "첫 화면에 걸려 있어요",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.primary,
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.primary)
+                                        .padding(horizontal = 12.dp, vertical = 2.dp),
                                 )
                             }
                         }
-                        Text(
-                            "고치기",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary,
+                        Icon(
+                            Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                            contentDescription = "고치기",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
