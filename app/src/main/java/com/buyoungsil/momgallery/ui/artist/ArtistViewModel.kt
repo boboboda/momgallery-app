@@ -21,6 +21,9 @@ class ArtistViewModel(private val repo: GalleryRepository) : ViewModel() {
     private val _state = MutableStateFlow(ArtistState())
     val state: StateFlow<ArtistState> = _state.asStateFlow()
 
+    // 로그인했는지 (로그인한 폰에서는 "작가 로그인" 버튼을 숨겨요)
+    val isAdmin: StateFlow<Boolean> = repo.isAdmin
+
     init {
         viewModelScope.launch {
             val list = repo.artworks().valueOrNull().orEmpty()

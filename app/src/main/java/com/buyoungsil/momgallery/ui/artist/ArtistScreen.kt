@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -43,9 +45,14 @@ private const val QUOTE =
 private val Mat = Color(0xFFF1F0EB)
 
 @Composable
-fun ArtistScreen(onOpenArtwork: (Int) -> Unit, onSeeWorks: () -> Unit) {
+fun ArtistScreen(
+    onOpenArtwork: (Int) -> Unit,
+    onSeeWorks: () -> Unit,
+    onLogin: () -> Unit,
+) {
     val vm = appViewModel { ArtistViewModel(it) }
     val state by vm.state.collectAsStateWithLifecycle()
+    val isAdmin by vm.isAdmin.collectAsStateWithLifecycle()
 
     val body = MaterialTheme.typography.bodyLarge.copy(
         fontFamily = FontFamily.Serif,
@@ -129,6 +136,23 @@ fun ArtistScreen(onOpenArtwork: (Int) -> Unit, onSeeWorks: () -> Unit) {
 
         Spacer(Modifier.height(48.dp))
         BigButton("작품 보기", onSeeWorks, outlined = true)
+
+        // 작가(엄마)만 쓰는 로그인. 로그인한 폰에서는 보이지 않아요.
+        if (!isAdmin) {
+            Spacer(Modifier.height(24.dp))
+            TextButton(
+                onClick = onLogin,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp),
+            ) {
+                Text(
+                    "작가 로그인",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
         Spacer(Modifier.height(32.dp))
     }
 }
