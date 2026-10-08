@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 테마 아이콘(Android 13+)용 단색 버전 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 액자 테두리 (바깥 사각형에서 안쪽 사각형을 뺌) -->
+    <path
+        android:fillColor="#FF000000"
+        android:fillType="evenOdd"
+        android:pathData="M31.4,33.8 H76.6 a1.5,1.5 0 0 1 1.5,1.5 V72.7 a1.5,1.5 0 0 1 -1.5,1.5 H31.4 a1.5,1.5 0 0 1 -1.5,-1.5 V35.3 a1.5,1.5 0 0 1 1.5,-1.5 z M33.4,37.3 V70.7 H74.6 V37.3 z" />
+    <!-- 해 -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M58.76,47.3 a4.34,4.34 0 1,0 8.68,0 a4.34,4.34 0 1,0 -8.68,0 z" />
+    <!-- 언덕 -->
+    <group>
+        <clip-path android:pathData="M33.4,37.3 H74.6 V70.7 H33.4 z" />
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M27.2,71.05 a18.55,16.35 0 1,0 37.1,0 a18.55,16.35 0 1,0 -37.1,0 z" />
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M45.8,75 a20.6,15.7 0 1,0 41.2,0 a20.6,15.7 0 1,0 -41.2,0 z" />
+    </group>
+</vector>
